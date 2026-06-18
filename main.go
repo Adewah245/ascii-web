@@ -1,16 +1,56 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"net/http"
 )
 
-func main() {
-	http.HandleFunc("/", homeHandler)
-	fmt.Println("Server starting on http://localhost:8080")
-	http.ListenAndServe(":8080", nil)
-
+type Data struct {
+	Art   string
+	Error string
 }
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "hello world")
+
+var tmpl = template.Must(template.ParseFiles("templates/index.html"))
+
+func main() {
+	if err := LoadAllBanners(); err != nil {
+		panic("Cannot load banners: " + err.Error())
+	}
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		tmpl.Execute(w, Data{})
+	})
+
+	http.HandleFunc("/ascii-art", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, "Bad request", 400)
+			return
+		}
+
+		text := r.FormValue("text")
+		banner := r.FormValue("banner")
+
+		if text == "" {
+			tmpl.Execute(w, Data{Error: "Please type something!"})
+			return
+		}
+		if banner == "" {
+			tmpl.Execute(w, Data{Error: "Choose a banner"})
+			return
+		}
+
+		b, ok := Banners[banner]
+		if !ok {
+			tmpl.Execute(w, Data{Error: "Wrong banner"})
+			return
+		}
+
+		lines := inputFile(text)
+		art := Generate(lines, b)
+
+		tmpl.Execute(w, Data{Art: art})
+	})
+
+	println("Server started → http://localhost:8080")
+	http.ListenAndServe(":8080", nil)
 }

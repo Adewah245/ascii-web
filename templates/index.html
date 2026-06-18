@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ASCII Art</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 30px; }
+        textarea { width: 500px; height: 120px; }
+        button { padding: 10px 20px; font-size: 18px; }
+        pre { text-align: left; background: #f8f8f8; padding: 15px; display: inline-block; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>ASCII Art Web</h1>
+
+    <form action="/ascii-art" method="post">
+        <textarea name="text" placeholder="Type your text here..."></textarea><br><br>
+        
+        Standard <input type="radio" name="banner" value="standard" checked> &nbsp;&nbsp;
+        Shadow <input type="radio" name="banner" value="shadow"> &nbsp;&nbsp;
+        Thinkertoy <input type="radio" name="banner" value="thinkertoy"><br><br>
+        
+        <button type="submit">Generate</button>
+    </form>
+
+    {{if .Error}}
+        <p class="error">{{.Error}}</p>
+    {{end}}
+
+    {{if .Art}}
+        <h2>Here is your art:</h2>
+        <pre>{{.Art}}</pre>
+    {{end}}
+</body>
+</html>
