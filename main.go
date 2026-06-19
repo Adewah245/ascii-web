@@ -39,7 +39,7 @@ func main() {
 			return
 		}
 
-		b, ok := Banners[banner]
+		b, ok := banners[banner]
 		if !ok {
 			tmpl.Execute(w, Data{Error: "Wrong banner"})
 			return

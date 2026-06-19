@@ -1,42 +1,43 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 )
 
-var Banners = make(map[string]map[rune][]string)
+var banners = make(map[string]map[rune][]string)
 
 func LoadAllBanners() error {
-	files := map[string]string{
+	file := map[string]string{
 		"standard":   "banners/standard.txt",
 		"shadow":     "banners/shadow.txt",
 		"thinkertoy": "banners/thinkertoy.txt",
 	}
-
-	for name, path := range files {
-		m, err := LoadBanner(path)
+	for name, ascii := range file {
+		m, err := LoadBanner(ascii)
 		if err != nil {
 			return err
 		}
-		Banners[name] = m
+		banners[name] = m
 	}
 	return nil
 }
-
-// === YOUR ORIGINAL FUNCTION (unchanged) ===
-func LoadBanner(fileName string) (map[rune][]string, error) {
-	data, err := os.ReadFile(fileName)
+func LoadBanner(filename string) (map[rune][]string, error) {
+	data, err := os.ReadFile(filename)
 	if err != nil {
-		return nil, err
+		fmt.Println("Error File Not Found!")
+		os.Exit(1)
 	}
 	if len(data) == 0 {
-		return nil, os.ErrInvalid
+		fmt.Println("File Present is Empty")
+		os.Exit(1)
 	}
 	text := strings.ReplaceAll(string(data), "\r\n", "\n")
 	lines := strings.Split(text, "\n")
-	if len(lines) != 855 {
-		return nil, os.ErrInvalid
+	if len(lines) < 855 || len(lines) > 855 {
+		fmt.Println("Error: Incomplete Lines")
+		os.Exit(1)
 	}
 	result := make(map[rune][]string)
 	for i := 0; i < 95; i++ {
